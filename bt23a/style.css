@@ -1,0 +1,131 @@
+/* Toàn trang: font chữ, nền tối, chữ trắng, căn giữa */
+body {
+    font-family: Arial, sans-serif;   /* kiểu chữ */
+    background: #1e2a3a;              /* màu nền trang */
+    color: #fff;                      /* màu chữ trắng */
+    text-align: center;               /* căn giữa nội dung */
+    margin: 0;                        /* bỏ lề mặc định */
+    padding: 20px;                    /* khoảng đệm quanh trang */
+}
+
+/* Thanh thông tin: điểm, thời gian, người chơi nằm trên một hàng */
+.info {
+    display: flex;                    /* xếp các ô theo hàng ngang */
+    justify-content: center;          /* căn giữa theo chiều ngang */
+    gap: 30px;                        /* khoảng cách giữa các ô */
+    font-size: 20px;                  /* cỡ chữ */
+    margin: 15px 0;                   /* lề trên dưới */
+}
+
+/* Số liệu được tô màu vàng cho nổi bật */
+.info b {
+    color: #ffd43b;                   /* màu vàng */
+}
+
+/* Hàng chứa ô nhập thời gian và các nút */
+.controls {
+    display: flex;                    /* xếp theo hàng ngang */
+    justify-content: center;          /* căn giữa */
+    align-items: center;              /* căn giữa theo chiều dọc */
+    gap: 10px;                        /* khoảng cách giữa các phần tử */
+    flex-wrap: wrap;                  /* màn hình hẹp thì xuống dòng */
+}
+
+/* Ô nhập số giây */
+#timeInput {
+    width: 70px;                      /* độ rộng ô nhập */
+    padding: 8px;                     /* khoảng đệm bên trong */
+    font-size: 16px;                  /* cỡ chữ */
+    border-radius: 6px;               /* bo góc */
+    border: none;                     /* bỏ viền */
+}
+
+/* Ô nhập bị khóa khi đang chơi: nền xám nhạt, chữ tối cho dễ đọc */
+#timeInput:disabled {
+    background: #ced4da;              /* nền xám nhạt */
+    color: #343a40;                   /* chữ xám đậm */
+}
+
+/* Kiểu chung của các nút */
+button {
+    padding: 10px 20px;               /* khoảng đệm trong nút */
+    font-size: 16px;                  /* cỡ chữ */
+    border: none;                     /* bỏ viền */
+    border-radius: 6px;               /* bo góc */
+    background: #12b886;              /* màu nền xanh lá */
+    color: #fff;                      /* chữ trắng */
+    cursor: pointer;                  /* con trỏ hình bàn tay */
+}
+
+/* Nút đổi màu và nút người chơi dùng màu khác */
+#colorBtn {
+    background: #7950f2;              /* màu tím */
+}
+#playerBtn {
+    background: #fd7e14;              /* màu cam */
+}
+
+/* Nút bị vô hiệu hóa (khi đang chơi) */
+button:disabled {
+    background: #868e96;              /* màu xám */
+    cursor: not-allowed;              /* con trỏ cấm */
+}
+
+/* Khung bao: làm mốc để #arena định vị tuyệt đối bên trong */
+.wrap {
+    position: relative;               /* làm mốc định vị */
+    width: 600px;                     /* rộng bằng khu vực chơi */
+    height: 400px;                    /* cao bằng khu vực chơi */
+    margin: 20px auto;                /* căn giữa trang */
+}
+
+/* Khu vực chơi 600px x 400px, định vị tuyệt đối */
+#arena {
+    position: absolute;               /* định vị tuyệt đối */
+    top: 0;                           /* sát mép trên khung bao */
+    left: 0;                          /* sát mép trái khung bao */
+    width: 600px;                     /* chiều rộng */
+    height: 400px;                    /* chiều cao */
+    background: #a5d8ff;              /* màu nền mặc định */
+    border: 4px solid #fff;           /* viền trắng */
+    border-radius: 10px;              /* bo góc */
+    box-sizing: border-box;           /* viền tính vào kích thước */
+    overflow: hidden;                 /* ẩn phần tràn ra ngoài */
+    transition: background 0.4s;      /* đổi màu nền mượt */
+}
+
+/* Khi hết giờ: khóa mọi thao tác chuột trong khu vực chơi */
+#arena.locked {
+    pointer-events: none;             /* không nhận click */
+}
+
+/* Mục tiêu: hình tròn nhỏ, vị trí do JS đặt bằng top/left */
+#target {
+    position: absolute;               /* định vị tuyệt đối trong #arena */
+    width: 40px;                      /* đường kính 40px */
+    height: 40px;
+    border-radius: 50%;               /* bo tròn thành hình tròn */
+    background: #fa5252;              /* màu đỏ */
+    border: 5px solid #fff;           /* viền trắng như bia bắn */
+    box-sizing: border-box;           /* viền tính vào kích thước */
+    cursor: pointer;                  /* con trỏ bàn tay */
+    display: none;                    /* ẩn khi chưa chơi */
+}
+
+/* Hộp thông báo giữa khu vực chơi */
+#message {
+    position: absolute;               /* định vị tuyệt đối */
+    top: 50%;                         /* đặt giữa theo chiều dọc */
+    left: 50%;                        /* đặt giữa theo chiều ngang */
+    transform: translate(-50%, -50%); /* dịch lại để căn giữa chính xác */
+    background: rgba(0, 0, 0, 0.75);  /* nền đen trong suốt */
+    padding: 20px 30px;               /* khoảng đệm */
+    border-radius: 10px;              /* bo góc */
+    font-size: 22px;                  /* cỡ chữ */
+}
+
+/* Dòng chân trang */
+.footer {
+    color: #adb5bd;                   /* màu xám nhạt */
+    font-size: 13px;                  /* chữ nhỏ */
+}

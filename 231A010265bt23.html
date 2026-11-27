@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài tập 23 - Game kiểm tra tốc độ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e2a3a;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin: 10px 0;
+        }
+        .info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 20px;
+            margin: 15px 0;
+        }
+        .info b {
+            color: #ffd43b;
+        }
+        button {
+            padding: 10px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: #12b886;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #868e96;
+            cursor: not-allowed;
+        }
+        /* Khung bao để #arena định vị tuyệt đối bên trong */
+        .wrap {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            margin: 20px auto;
+        }
+        /* Khu vực chơi 600 x 400, định vị tuyệt đối */
+        #arena {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 600px;
+            height: 400px;
+            background: linear-gradient(135deg, #a5d8ff, #d0bfff);
+            border: 4px solid #fff;
+            border-radius: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        /* Mục tiêu: hình tròn nhỏ, định vị tuyệt đối theo top/left */
+        #target {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 20%, #fa5252 22%, #fa5252 45%, #fff 47%, #fff 60%, #fa5252 62%);
+            cursor: pointer;
+            display: none;
+        }
+        /* Khóa thao tác khi hết giờ */
+        #arena.locked {
+            pointer-events: none;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.75);
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 22px;
+        }
+        .footer {
+            color: #adb5bd;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game kiểm tra tốc độ phản xạ</h1>
+
+    <div class="info">
+        <div>Điểm: <b id="score">0</b></div>
+        <div>Thời gian: <b id="time">30</b> giây</div>
+    </div>
+
+    <button id="startBtn" onclick="startGame()">Bắt đầu trò chơi</button>
+
+    <div class="wrap">
+        <div id="arena">
+            <div id="target" onclick="hitTarget()"></div>
+            <div id="message">Bấm "Bắt đầu trò chơi" để chơi</div>
+        </div>
+    </div>
+
+    <p class="footer">Nguyễn Hoà Ngọc Nhiên - MSSV: 231A010265</p>
+
+    <script>
+        const GAME_TIME = 30;     // thời gian chơi (giây)
+        const TARGET_SIZE = 40;   // kích thước mục tiêu (px)
+
+        const arena = document.getElementById("arena");
+        const target = document.getElementById("target");
+        const scoreEl = document.getElementById("score");
+        const timeEl = document.getElementById("time");
+        const message = document.getElementById("message");
+        const startBtn = document.getElementById("startBtn");
+
+        let score = 0;
+        let timeLeft = GAME_TIME;
+        let moveTimer = null;     // hẹn giờ đổi vị trí mục tiêu mỗi 1 giây
+        let countdown = null;     // hẹn giờ đếm ngược
+        let playing = false;
+
+        // Đưa mục tiêu tới vị trí top/left ngẫu nhiên trong #arena
+        function moveTarget() {
+            const maxLeft = arena.clientWidth - TARGET_SIZE;
+            const maxTop = arena.clientHeight - TARGET_SIZE;
+            target.style.left = Math.floor(Math.random() * maxLeft) + "px";
+            target.style.top = Math.floor(Math.random() * maxTop) + "px";
+        }
+
+        // Đặt lại hẹn giờ: sau mỗi 1 giây mục tiêu tự đổi vị trí
+        function restartMoveTimer() {
+            clearInterval(moveTimer);
+            moveTimer = setInterval(moveTarget, 1000);
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = GAME_TIME;
+            playing = true;
+            scoreEl.textContent = score;
+            timeEl.textContent = timeLeft;
+            message.style.display = "none";
+            arena.classList.remove("locked");
+            startBtn.disabled = true;
+
+            target.style.display = "block";
+            moveTarget();
+            restartMoveTimer();
+
+            countdown = setInterval(function () {
+                timeLeft--;
+                timeEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Click trúng mục tiêu: +1 điểm, đổi vị trí ngay
+        function hitTarget() {
+            if (!playing) return;
+            score++;
+            scoreEl.textContent = score;
+            moveTarget();
+            restartMoveTimer();
+        }
+
+        // Hết giờ: dừng hẹn giờ, khóa thao tác, hiện tổng điểm
+        function endGame() {
+            playing = false;
+            clearInterval(countdown);
+            clearInterval(moveTimer);
+            target.style.display = "none";
+            arena.classList.add("locked");
+            message.innerHTML = "Hết giờ!<br>Tổng điểm của bạn: <b>" + score + "</b>";
+            message.style.display = "block";
+            startBtn.disabled = false;
+            startBtn.textContent = "Chơi lại";
+        }
+    </script>
+</body>
+</html>
